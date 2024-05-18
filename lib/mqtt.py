@@ -14,16 +14,10 @@ class MQTT:
         self.client.on_subscribe = self.on_subscribe
         self.on_message_callback = on_message
         self.broker_host = broker_host
-        
-    @classmethod
-    async def create(cls, on_message, broker_host = HOST, client_id=CLIENT_ID):
-        mqtt = cls(on_message, broker_host, client_id)
-        await mqtt.client.connect(mqtt.broker_host)
-        return mqtt
+        asyncio.create_task(self.client.connect(self.broker_host))
 
     def on_connect(self, client, flags, rc, properties):
-        print('Connected')
-        client.subscribe('CITS5506SMARTFAN/#', qos=0)
+        self.client.subscribe('CITS5506SMARTFAN/CONTROL', qos=1)
 
     def on_message(self, client, topic, payload, qos, properties):
         self.on_message_callback(data = json.loads(payload))
@@ -34,6 +28,9 @@ class MQTT:
     def on_subscribe(self, client, mid, qos, properties):
         print('SUBSCRIBED')
 
+    def report(self, data):
+        self.client.publish("CITS5506SMARTFAN/REPORT", data)
+    
     async def on_close(self):
         await self.client.disconnect()
 

@@ -5,4 +5,5 @@ from .led import Led
 from .mqtt import MQTT
 from .relay import Relay
 from .temperature import Temperature
+from .reporter import Reporter
 from .utils import await_helper

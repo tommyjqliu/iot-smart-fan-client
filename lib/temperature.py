@@ -12,12 +12,12 @@ class Temperature:
     @property
     def ambient_temperature(self):
         # Return the ambient temperature formatted to two decimal places
-        return "{:.2f}".format(self.mlx.ambient_temperature)
+        return round(self.mlx.ambient_temperature, 2)
 
     @property
     def target_temperature(self):
         # Return the target/object temperature formatted to two decimal places
-        return "{:.2f}".format(self.mlx.object_temperature)
+        return round(self.mlx.object_temperature, 2)
 
     def on_close(self):
         pass

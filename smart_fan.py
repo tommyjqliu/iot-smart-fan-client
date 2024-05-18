@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import asyncio
-from lib import Button, Camera, Fan, Led, MQTT, Temperature, await_helper
+from lib import Button, Camera, Fan, Led, MQTT, Temperature, Reporter, await_helper
 
 
 STOP = asyncio.Event()
@@ -9,22 +9,25 @@ class SmartFan():
     def __init__(self, loop):
         GPIO.setmode(GPIO.BCM)
         self.loop = loop
-        self.running = False
+        self.active = False
         self.module_definition = [
             ("fan", Fan, {}),
             ("led", Led, {}),
-            # ("button", Button, {"loop": loop, "callback": self.on_button}),
-            # ("camera", Camera, {}),
-            # ("temperature", Temperature, {}),
-            ("mqtt", MQTT.create, {"on_message": self.on_message})
+            ("button", Button, {"loop": loop, "callback": self.on_button}),
+            ("camera", Camera, {}),
+            ("temperature", Temperature, {}),
+            ("mqtt", MQTT, {"on_message": self.on_message}),
+            ("reporter", Reporter, {"smart_fan": self}),
         ]
         self.modules = {}
         
 
     def on_message(self, data):
         print(f'fan received message: {data}', type(data))
-        # speed = int(data["speed"])
-        # self.setSpeed(speed)
+        self.active = data.get("active", self.active)
+        print(self.active )
+        self.modules["fan"].speed = data.get("fan_speed",self.modules["fan"].speed) if self.active else 0
+            
 
     def on_button(self, event, time):
         print(event)
@@ -36,10 +39,10 @@ class SmartFan():
         instances = await asyncio.gather(*gathers)
         for i, (name, cls, params),  in enumerate(self.module_definition):
             self.modules[name] = instances[i]
-        self.running = True
+        self.active = True
 
     async def turn_off(self):
-        self.running = False
+        self.active = False
         gathers = []
         for name, _, _ in self.module_definition:
             module = self.modules.get(name)

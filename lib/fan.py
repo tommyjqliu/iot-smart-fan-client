@@ -10,6 +10,7 @@ class Fan:
         self.pwm = GPIO.PWM(PWM_GPIO, 1000)
         self.pwm.start(0)
         self.relay = Relay()
+        self._speed = 0
     
     @property
     def speed(self):
@@ -18,6 +19,7 @@ class Fan:
     @speed.setter
     def speed(self, _value):
         value = max(0, min(_value, 100))
+        self._speed = value
         if value == 0:
             self.relay.off()
             self.pwm.ChangeDutyCycle(0)

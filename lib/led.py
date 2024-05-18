@@ -28,12 +28,12 @@ class Led:
             pos -= 170
             return Color(0, pos * 3, 255 - pos * 3)
 
-    async def colorWipe(self, color, wait_ms=2000):
+    async def colorWipe(self, color, wait_ms=30):
         """一次擦除显示像素的颜色."""
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, color)
-        self.strip.show()
-        await sleep(wait_ms / 1000.0)
+            self.strip.show()
+            await sleep(wait_ms / 1000.0)
 
     async def theaterChase(self, color, wait_ms=50, iterations=10):
         """电影影院灯光风格的追逐动画."""
@@ -73,5 +73,5 @@ class Led:
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
     
-    def on_close(self):
-        create_task(self.colorWipe(Color(0,0,0)))
+    async def on_close(self):
+        await self.colorWipe(Color(0,0,0))
