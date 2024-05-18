@@ -1,6 +1,7 @@
 import time
 from rpi_ws281x import PixelStrip, Color
 
+LED_GPIO = 18
 LED_COUNT = 16  # LED灯的个数
 LED_PIN = 18  # DI端接GPIO18
 # 以下可以不用改
@@ -11,7 +12,7 @@ LED_INVERT = False  # True to invert the signal (when using NPN transistor level
 LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 class Led:
-    def __init__(self, led_gpio):
+    def __init__(self, led_gpio = LED_GPIO):
         self.strip = PixelStrip(LED_COUNT, led_gpio, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
         self.strip.begin()
 
@@ -70,3 +71,6 @@ class Led:
                 time.sleep(wait_ms / 1000.0)
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
+    
+    def on_close(self):
+        pass
