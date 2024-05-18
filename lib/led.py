@@ -15,6 +15,7 @@ class Led:
     def __init__(self, led_gpio = LED_GPIO):
         self.strip = PixelStrip(LED_COUNT, led_gpio, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
         self.strip.begin()
+        self.colorWipe(Color(0,0,255))
 
     def colorWipe(self, color, wait_ms=20):
         """一次擦除显示像素的颜色."""
@@ -73,4 +74,4 @@ class Led:
                     self.strip.setPixelColor(i + q, 0)
     
     def on_close(self):
-        pass
+        self.colorWipe(Color(0,0,0))

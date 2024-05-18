@@ -1,27 +1,22 @@
 import RPi.GPIO as GPIO
-from lib.button import Button
-from lib.camera import Camera
-from lib.fan import Fan
-from lib.led import Led
-from lib.mqtt import MQTT
 import asyncio
-
-from lib.relay import Relay
-from lib.utils import await_helper
+from lib import Button, Camera, Fan, Led, MQTT, Relay, Temperature, await_helper
 
 
 STOP = asyncio.Event()
 
 class SmartFan():
-    def __init__(self):
+    def __init__(self, loop):
         GPIO.setmode(GPIO.BCM)
+        self.loop = loop
         self.running = False
         self.submodule_definition = [
             ("relay", Relay, {}),
-            ("led", Led, {}),
-            ("button", Button, {}),
             ("fan", Fan, {}),
-            ("camera", Camera, {}),
+            ("led", Led, {}),
+            # ("button", Button, {"loop": loop, "callback": self.on_button}),
+            # ("camera", Camera, {}),
+            # ("temperature", Temperature, {}),
             ("mqtt", MQTT.create, {"on_message": self.on_message})
         ]
         self.submodules = {}
@@ -31,7 +26,10 @@ class SmartFan():
         print(f'fan received message: {data}', type(data))
         # speed = int(data["speed"])
         # self.setSpeed(speed)
-    
+
+    def on_button(self, event, time):
+        print(event)
+
     async def turn_on(self):
         for name, cls, params in self.submodule_definition:
             self.submodules[name] = await await_helper(cls(**params))
@@ -42,7 +40,10 @@ class SmartFan():
         for name, _, _ in self.submodule_definition:
             module = self.submodules.get(name)
             if module:
-                await await_helper(module.on_close())
+                try:
+                    await await_helper(module.on_close())
+                except Exception as e:
+                    print(f"An error occurred during close: {e}")
 
 
     ### Life Cycle ###

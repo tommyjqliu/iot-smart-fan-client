@@ -10,6 +10,7 @@ class Camera():
         self.rekognition = boto3.client('rekognition')
         self.picam.start()
 
+
     def capture_image(self, file_name):
         self.picam.capture_file(file_name)
         return file_name
