@@ -1,4 +1,4 @@
-import time
+from asyncio import create_task, sleep
 from rpi_ws281x import PixelStrip, Color
 
 LED_GPIO = 18
@@ -15,26 +15,8 @@ class Led:
     def __init__(self, led_gpio = LED_GPIO):
         self.strip = PixelStrip(LED_COUNT, led_gpio, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
         self.strip.begin()
-        self.colorWipe(Color(0,0,255))
-
-    def colorWipe(self, color, wait_ms=20):
-        """一次擦除显示像素的颜色."""
-        for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, color)
-        self.strip.show()
-        time.sleep(wait_ms / 1000.0)
-
-    def theaterChase(self, color, wait_ms=50, iterations=10):
-        """电影影院灯光风格的追逐动画."""
-        for j in range(iterations):
-            for q in range(3):
-                for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i + q, color)
-                self.strip.show()
-                time.sleep(wait_ms / 1000.0)
-                for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i + q, 0)
-
+        create_task(self.colorWipe(Color(0,0,255)))
+    
     def wheel(self, pos):
         """生成横跨0-255个位置的彩虹颜色."""
         if pos < 85:
@@ -46,32 +28,50 @@ class Led:
             pos -= 170
             return Color(0, pos * 3, 255 - pos * 3)
 
-    def rainbow(self, wait_ms=20, iterations=1):
+    async def colorWipe(self, color, wait_ms=2000):
+        """一次擦除显示像素的颜色."""
+        for i in range(self.strip.numPixels()):
+            self.strip.setPixelColor(i, color)
+        self.strip.show()
+        await sleep(wait_ms / 1000.0)
+
+    async def theaterChase(self, color, wait_ms=50, iterations=10):
+        """电影影院灯光风格的追逐动画."""
+        for j in range(iterations):
+            for q in range(3):
+                for i in range(0, self.strip.numPixels(), 3):
+                    self.strip.setPixelColor(i + q, color)
+                self.strip.show()
+                sleep(wait_ms / 1000.0)
+                for i in range(0, self.strip.numPixels(), 3):
+                    self.strip.setPixelColor(i + q, 0)
+
+    async def rainbow(self, wait_ms=20, iterations=1):
         """绘制彩虹，褪色的所有像素一次."""
         for j in range(256 * iterations):
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, self.wheel((i + j) & 255))
             self.strip.show()
-            time.sleep(wait_ms / 1000.0)
+            sleep(wait_ms / 1000.0)
 
-    def rainbowCycle(self, wait_ms=10, iterations=5):
+    async def rainbowCycle(self, wait_ms=10, iterations=5):
         """画出均匀分布在所有像素上的彩虹."""
         for j in range(256 * iterations):
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, self.wheel((int(i * 256 / self.strip.numPixels()) + j) & 255))
             self.strip.show()
-            time.sleep(wait_ms / 1000.0)
+            sleep(wait_ms / 1000.0)
 
-    def theaterChaseRainbow(self, wait_ms=50):
+    async def theaterChaseRainbow(self, wait_ms=50):
         """旋转的彩色灯光."""
         for j in range(256):
             for q in range(3):
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, self.wheel((i + j) % 255))
                 self.strip.show()
-                time.sleep(wait_ms / 1000.0)
+                sleep(wait_ms / 1000.0)
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
     
     def on_close(self):
-        self.colorWipe(Color(0,0,0))
+        create_task(self.colorWipe(Color(0,0,0)))

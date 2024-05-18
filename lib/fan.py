@@ -1,5 +1,7 @@
 import RPi.GPIO as GPIO
 
+from lib.relay import Relay
+
 PWM_GPIO = 12
 
 class Fan:
@@ -7,6 +9,7 @@ class Fan:
         GPIO.setup(PWM_GPIO, GPIO.OUT)
         self.pwm = GPIO.PWM(PWM_GPIO, 1000)
         self.pwm.start(0)
+        self.relay = Relay()
     
     @property
     def speed(self):
