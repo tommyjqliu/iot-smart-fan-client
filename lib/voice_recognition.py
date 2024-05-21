@@ -14,7 +14,7 @@ class VoiceRecognition:
     def record_audio(self):
         file_name = f'test{self.num}.wav'
         print(f'Starting to record audio for {self.time_listening} seconds...')
-        subprocess.run(["arecord", "-D", "plughw:1,0", self.time_listening, file_name], check=True)
+        subprocess.run(["arecord", "-D", "plughw:1,0", f"--duration={self.time_listening}", file_name], check=True)
         return file_name
 
     def upload_to_s3(self, file_name):
