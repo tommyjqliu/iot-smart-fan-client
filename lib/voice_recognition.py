@@ -92,6 +92,9 @@ class VoiceRecognition:
         elif "speed down" in transcript_text or "down" in transcript_text:
             result = "DOWN"
         return result
+    
+    def on_close(self):
+        pass
 
 # Example usage
 # if __name__ == "__main__":

@@ -48,6 +48,9 @@ class Led:
                 sleep(wait_ms / 1000.0)
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
+                
+    def run_rainbow(self):
+        create_task(self.theaterChaseRainbow())
 
     async def rainbow(self, wait_ms=20, iterations=1):
         """绘制彩虹，褪色的所有像素一次."""

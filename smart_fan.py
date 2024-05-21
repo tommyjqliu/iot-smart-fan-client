@@ -27,45 +27,42 @@ class SmartFan():
         print(f'Fan received message: {data}')
         self.active = data.get("active", self.active)
         if self.active:
-            self.modules["led"].run_color_wipe(0,0,255)
-            self.modules["fan"].speed = data.get("fan_speed",self.modules["fan"].speed)
-            self.modules["camera"].active = data.get("auto_fan_off",self.modules["camera"].active)
+            self.wake_up(data)
         else:
-            self.modules["led"].run_color_wipe(0,0,0)
-            self.modules["fan"].speed = 0
-            self.modules["camera"].active = False
+            self.sleep()
             
+    def sleep(self):
+        self.modules["led"].run_color_wipe(0,0,0)
+        self.modules["fan"].speed = 0
+        self.modules["camera"].active = False
 
-    async def on_button(self, event, time):
+    def wake_up(self, data = {}):
+        self.modules["led"].run_color_wipe(0,0,255)
+        self.modules["fan"].speed = data.get("fan_speed",self.modules["fan"].speed)
+        self.modules["camera"].active = data.get("auto_fan_off",self.modules["camera"].active)
+
+    def on_button(self, event, time):
         if(event == 'click'):
-            self.modules["led"].rainbowCycle()
-            result = self.modules["voice_recognition"].process_voice_recognition()
-            self.modules["led"].run_color_wipe(0,0,255)
-            if result == "ON":
-                try:
-                    await self.turn_on()
-                    self.modules['fan'].speed = 50
-                    await STOP.wait()
-                except Exception as e:
-                    print(f"An error occurred during operation: {e}")
-            elif result == "OFF":
-                try:
-                    await self.turn_off()
-                except Exception as e:
-                    print(f"An error occurred during operation: {e}")
-            elif result == "UP":
-                if self.modules["fan"].speed < 90:
-                    self.modules["fan"].speed += 10
-                elif self.modules["fan"].speed < 100 and self.modules["fan"].speed > 90:
-                    self.modules["fan"].speed = 100
-            elif result == "DOWN":
-                if self.modules["fan"].speed > 10:
-                    self.modules["fan"].speed -= 10
-                elif self.modules["fan"].speed < 10 and self.modules["fan"].speed > 0:
-                    try:
-                        await self.turn_off()
-                    except Exception as e:
-                        print(f"An error occurred during operation: {e}")
+            try:
+                self.modules["led"].run_rainbow()
+                result = self.modules["voice_recognition"].process_voice_recognition()
+                self.modules["led"].run_color_wipe(0,0,255)
+                if result == "ON":
+                    self.wake_up()
+                elif result == "OFF":
+                    self.sleep()
+                elif result == "UP":
+                    if self.modules["fan"].speed < 90:
+                        self.modules["fan"].speed += 10
+                    elif self.modules["fan"].speed < 100 and self.modules["fan"].speed > 90:
+                        self.modules["fan"].speed = 100
+                elif result == "DOWN":
+                    if self.modules["fan"].speed > 10:
+                        self.modules["fan"].speed -= 10
+                    elif self.modules["fan"].speed < 10 and self.modules["fan"].speed > 0:
+                        self.modules["fan"].speed = 0
+            except Exception as e:
+                print(f"An error occurred during operation: {e}")
 
     async def turn_on(self):
         gathers = []

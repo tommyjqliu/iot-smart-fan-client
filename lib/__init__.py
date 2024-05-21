@@ -7,3 +7,4 @@ from .relay import Relay
 from .temperature import Temperature
 from .reporter import Reporter
 from .utils import await_helper
+from .voice_recognition import VoiceRecognition
