@@ -64,7 +64,7 @@ class VoiceRecognition:
             raise Exception(f'Error fetching transcript: {response.status_code}')
 
     def countdown(self):
-        for i in range(self.time_listening, 0, -1):
+        for i in range(self.time_listening + 1, 0, -1):
             print(f"Start Listening")
             print(f"Countdown: {i}")
             time.sleep(1)
