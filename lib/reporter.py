@@ -15,13 +15,10 @@ class Reporter:
         try:
             data = {
                 "date": datetime.now(timezone.utc).isoformat(),
-                "status": {
-                    "online": online,
-                    "active": self.smart_fan.active,
-                    "fan_speed": self.smart_fan.modules["fan"].speed,
-                    "temperature": self.smart_fan.modules["temperature"].target_temperature,
-                    "auto_fan_off": self.smart_fan.modules["camera"].active,
-                }
+                "active": self.smart_fan.active,
+                "fan_speed": self.smart_fan.modules["fan"].speed,
+                "temperature": self.smart_fan.modules["temperature"].target_temperature,
+                "auto_fan_off": self.smart_fan.modules["camera"].active,
             }
 
             json_data = json.dumps(data)
@@ -44,5 +41,4 @@ class Reporter:
             await asyncio.sleep(15)  # Wait for 15 seconds
     
     async def on_close(self):
-        await self.report(False)
         self.report_task.cancel()
