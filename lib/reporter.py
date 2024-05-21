@@ -1,6 +1,7 @@
 import requests
 import json
 import asyncio
+from datetime import datetime, timezone
 
 URL = "https://iot-smart-fan.vercel.app/api/fan"
 
@@ -13,19 +14,23 @@ class Reporter:
     async def report(self, online = True):
         try:
             data = {
-                "online": online,
-                "active": self.smart_fan.active,
-                "fan_speed": self.smart_fan.modules["fan"].speed,
-                "temperature": self.smart_fan.modules["temperature"].target_temperature,
+                "date": datetime.now(timezone.utc).isoformat(),
+                "status": {
+                    "online": online,
+                    "active": self.smart_fan.active,
+                    "fan_speed": self.smart_fan.modules["fan"].speed,
+                    "temperature": self.smart_fan.modules["temperature"].target_temperature,
+                    "auto_fan_off": self.smart_fan.modules["camera"].active,
+                }
             }
 
             json_data = json.dumps(data)
-            print(json_data)
+         
             self.smart_fan.modules["mqtt"].report(json_data)
             response = requests.post(URL, data=json_data, headers={'Content-Type': 'application/json'})
 
             if response.status_code == 200:
-                print("Data sent successfully!")
+                print(f'Fan send message: {data}')
             else:
                 print(f"Error: {response.status_code} - {response.text}")
 

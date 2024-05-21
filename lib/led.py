@@ -15,7 +15,7 @@ class Led:
     def __init__(self, led_gpio = LED_GPIO):
         self.strip = PixelStrip(LED_COUNT, led_gpio, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
         self.strip.begin()
-        create_task(self.colorWipe(Color(0,0,255)))
+        self.run_color_wipe(0,0,255)
     
     def wheel(self, pos):
         """生成横跨0-255个位置的彩虹颜色."""
@@ -27,6 +27,9 @@ class Led:
         else:
             pos -= 170
             return Color(0, pos * 3, 255 - pos * 3)
+
+    def run_color_wipe(self, red, green, blue):
+        create_task(self.colorWipe(Color(red, green, blue, 255)))
 
     async def colorWipe(self, color, wait_ms=30):
         """一次擦除显示像素的颜色."""

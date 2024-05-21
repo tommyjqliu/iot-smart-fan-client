@@ -14,19 +14,25 @@ class SmartFan():
             ("fan", Fan, {}),
             ("led", Led, {}),
             ("button", Button, {"loop": loop, "callback": self.on_button}),
-            ("camera", Camera, {}),
+            ("camera", Camera, {"smart_fan": self}),
             ("temperature", Temperature, {}),
-            ("mqtt", MQTT, {"on_message": self.on_message}),
             ("reporter", Reporter, {"smart_fan": self}),
+            ("mqtt", MQTT, {"on_message": self.on_message}),
         ]
         self.modules = {}
         
 
     def on_message(self, data):
-        print(f'fan received message: {data}', type(data))
+        print(f'Fan received message: {data}')
         self.active = data.get("active", self.active)
-        print(self.active )
-        self.modules["fan"].speed = data.get("fan_speed",self.modules["fan"].speed) if self.active else 0
+        if self.active:
+            self.modules["led"].run_color_wipe(0,0,255)
+            self.modules["fan"].speed = data.get("fan_speed",self.modules["fan"].speed)
+            self.modules["camera"].active = data.get("auto_fan_off",self.modules["camera"].active)
+        else:
+            self.modules["led"].run_color_wipe(0,0,0)
+            self.modules["fan"].speed = 0
+            self.modules["camera"].active = False
             
 
     def on_button(self, event, time):

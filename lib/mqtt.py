@@ -10,8 +10,8 @@ class MQTT:
         self.client = gmqtt.Client(client_id)
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        self.client.on_disconnect = self.on_disconnect
-        self.client.on_subscribe = self.on_subscribe
+        # self.client.on_disconnect = self.on_disconnect
+        # self.client.on_subscribe = self.on_subscribe
         self.on_message_callback = on_message
         self.broker_host = broker_host
         asyncio.create_task(self.client.connect(self.broker_host))
@@ -22,11 +22,11 @@ class MQTT:
     def on_message(self, client, topic, payload, qos, properties):
         self.on_message_callback(data = json.loads(payload))
 
-    def on_disconnect(self, client, packet, exc=None):
-        print('Disconnected')
+    # def on_disconnect(self, client, packet, exc=None):
+    #     print('Disconnected')
 
-    def on_subscribe(self, client, mid, qos, properties):
-        print('SUBSCRIBED')
+    # def on_subscribe(self, client, mid, qos, properties):
+    #     print('SUBSCRIBED')
 
     def report(self, data):
         self.client.publish("CITS5506SMARTFAN/REPORT", data)
