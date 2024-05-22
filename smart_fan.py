@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import asyncio
-from lib import Button, Camera, Fan, Led, MQTT, Temperature, Reporter, await_helper, VoiceRecognition
+from lib import Button, Camera, Fan, Led, MQTT, Temperature, Reporter, await_helper, VoiceRecognition, Distance
 
 
 STOP = asyncio.Event()
@@ -18,7 +18,8 @@ class SmartFan():
             ("temperature", Temperature, {}),
             ("reporter", Reporter, {"smart_fan": self}),
             ("mqtt", MQTT, {"on_message": self.on_message}),
-            ("voice_recognition", VoiceRecognition, {}),
+            # ("voice_recognition", VoiceRecognition, {}),
+            ("distance", Distance, {"smart_fan": self})
         ]
         self.modules = {}
         

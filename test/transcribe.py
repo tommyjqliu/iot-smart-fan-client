@@ -10,7 +10,7 @@ transcribe_client = boto3.client('transcribe')
 # Define variables
 TIME_LISTENING = 10
 num = 1
-bucket_name = 'voice-recognition-iot1'
+bucket_name = 'voice-recognition-iot'
 file_name = f'test{num}.wav'
 s3_file_path = f's3://{bucket_name}/{file_name}'
 transcription_job_name = 'testTranscriptionJob{num}'

@@ -45,12 +45,12 @@ class Led:
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, color)
                 self.strip.show()
-                sleep(wait_ms / 1000.0)
+                await sleep(wait_ms / 1000.0)
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
                 
     def run_rainbow(self):
-        create_task(self.theaterChaseRainbow())
+        create_task(self.rainbowCycle())
 
     async def rainbow(self, wait_ms=20, iterations=1):
         """绘制彩虹，褪色的所有像素一次."""
@@ -58,7 +58,7 @@ class Led:
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, self.wheel((i + j) & 255))
             self.strip.show()
-            sleep(wait_ms / 1000.0)
+            await sleep(wait_ms / 1000.0)
 
     async def rainbowCycle(self, wait_ms=10, iterations=5):
         """画出均匀分布在所有像素上的彩虹."""
@@ -66,7 +66,7 @@ class Led:
             for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, self.wheel((int(i * 256 / self.strip.numPixels()) + j) & 255))
             self.strip.show()
-            sleep(wait_ms / 1000.0)
+            await sleep(wait_ms / 1000.0)
 
     async def theaterChaseRainbow(self, wait_ms=50):
         """旋转的彩色灯光."""
@@ -75,7 +75,7 @@ class Led:
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, self.wheel((i + j) % 255))
                 self.strip.show()
-                sleep(wait_ms / 1000.0)
+                await sleep(wait_ms / 1000.0)
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i + q, 0)
     

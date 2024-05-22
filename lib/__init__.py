@@ -8,3 +8,4 @@ from .temperature import Temperature
 from .reporter import Reporter
 from .utils import await_helper
 from .voice_recognition import VoiceRecognition
+from .distance import Distance
